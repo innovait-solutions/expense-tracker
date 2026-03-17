@@ -98,15 +98,20 @@ export async function DELETE(
 
     const { id } = params;
 
+    await prisma.partner.update({
+      where: { id, organizationId: session.organizationId },
+      data: { isArchived: true }
+    });
+
     await logActivity({
       userId: session.userId,
       organizationId: session.organizationId,
-      action: "DELETE",
+      action: "ARCHIVE",
       entityType: "PARTNER",
       entityId: id,
     });
 
-    return NextResponse.json({ message: "Partner deleted" });
+    return NextResponse.json({ message: "Partner archived" });
   } catch (error) {
     console.error("Delete partner error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
-import { Plus, Users, Mail, Trash2, Edit2, Info, X, TrendingUp } from "lucide-react";
+import { Plus, Users, Mail, Trash2, Edit2, Info, X, TrendingUp, Link, RefreshCcw, Check } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { useOrganization } from "@/hooks/use-organization";
 
@@ -16,6 +16,8 @@ export default function PartnersPage() {
   const [editingPartner, setEditingPartner] = useState<any>(null);
   
   const [formData, setFormData] = useState({ name: "", email: "" });
+  const [copying, setCopying] = useState<string | null>(null);
+  const [reinviting, setReinviting] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
@@ -75,6 +77,25 @@ export default function PartnersPage() {
     }
   };
 
+  const handleReinvite = async (id: string) => {
+    setReinviting(id);
+    try {
+        await axios.post(`/api/partners/${id}/reinvite`);
+        alert("Invitation email sent successfully!");
+    } catch (err: any) {
+        alert(err.response?.data?.error || "Failed to send invitation.");
+    } finally {
+        setReinviting(null);
+    }
+  };
+
+  const handleCopyLink = (partner: any) => {
+    const link = `${window.location.origin}/register`;
+    navigator.clipboard.writeText(link);
+    setCopying(partner.id);
+    setTimeout(() => setCopying(null), 2000);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -117,13 +138,40 @@ export default function PartnersPage() {
                 <p className="text-sm text-muted-foreground text-center truncate mb-4">
                     {partner.email}
                 </p>
-                <div className="flex justify-center">
+                <div className="flex flex-col space-y-2 mt-4">
                     <button 
                         onClick={() => handleViewDetails(partner.id)}
-                        className="flex items-center text-xs font-semibold px-4 py-1.5 bg-muted rounded-full hover:bg-primary hover:text-primary-foreground transition-colors"
+                        className="flex items-center justify-center text-xs font-semibold px-4 py-2 bg-muted rounded-full hover:bg-primary hover:text-primary-foreground transition-all"
                     >
-                        <Info className="h-3 w-3 mr-1" /> View Details
+                        <Info className="h-3 w-3 mr-1.5" /> View Details
                     </button>
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={() => handleReinvite(partner.id)}
+                            disabled={reinviting === partner.id}
+                            title="Resend Invitation Email"
+                            className="flex-1 flex items-center justify-center text-xs font-semibold py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary hover:text-primary-foreground transition-all disabled:opacity-50"
+                        >
+                            {reinviting === partner.id ? (
+                                <RefreshCcw className="h-3 w-3 animate-spin" />
+                            ) : (
+                                <Mail className="h-3 w-3 mr-1.5" />
+                            )}
+                            Re-invite
+                        </button>
+                        <button 
+                            onClick={() => handleCopyLink(partner)}
+                            title="Copy Invitation Link"
+                            className="flex-1 flex items-center justify-center text-xs font-semibold py-2 bg-muted rounded-lg hover:bg-accent transition-all"
+                        >
+                            {copying === partner.id ? (
+                                <Check className="h-3 w-3 text-green-500 mr-1.5" />
+                            ) : (
+                                <Link className="h-3 w-3 mr-1.5" />
+                            )}
+                            {copying === partner.id ? "Copied" : "Copy Link"}
+                        </button>
+                    </div>
                 </div>
             </div>
           ))

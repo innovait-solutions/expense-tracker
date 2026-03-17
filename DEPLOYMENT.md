@@ -134,6 +134,13 @@ To apply your schema to the production database:
    ```
    *Always use `migrate deploy` in production to apply migrations safely.*
 
+### 4. Email Integration (Resend)
+To send invitation emails:
+1. Create an account at [resend.com](https://resend.com).
+2. Create an **API Key**.
+3. Add `RESEND_API_KEY` to your Vercel Environment Variables.
+4. (Optional) Set `NEXT_PUBLIC_APP_URL` to your production domain so links in emails point to the right place.
+
 ---
 
 ## Technical Support & Maintenance

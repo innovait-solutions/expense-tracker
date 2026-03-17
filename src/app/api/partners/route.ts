@@ -9,7 +9,10 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const partners = await prisma.partner.findMany({
-    where: { organizationId: session.organizationId },
+    where: { 
+      organizationId: session.organizationId,
+      isArchived: false,
+    },
   });
   return NextResponse.json(partners);
 }
