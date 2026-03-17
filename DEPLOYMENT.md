@@ -123,7 +123,6 @@ For a professional, scalable deployment, we recommend the following stack:
 2. Add the following **Environment Variables**:
    - `DATABASE_URL`: Your Supabase connection string.
    - `JWT_SECRET`: A long, random string.
-   - `NODE_ENV`: `production`
 3. Click **Deploy**. Vercel will handle the build and automatically run `prisma generate` via our `postinstall` script.
 
 ### 3. Database Migrations
