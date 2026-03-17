@@ -90,7 +90,7 @@ export default function UserProfilePage() {
         <div className="lg:col-span-2 space-y-4">
             <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mr-auto">Personal Information</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-                Update your account's primary identification details. Changes here will be reflected across the organization's collaboration logs.
+                Update your account&apos;s primary identification details. Changes here will be reflected across the organization&apos;s collaboration logs.
             </p>
         </div>
         
@@ -145,7 +145,7 @@ export default function UserProfilePage() {
         <div className="lg:col-span-2 space-y-4 pt-4 border-t lg:border-t-0">
             <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Security & Password</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-                Maintain your account's security by choosing a strong password. We recommend a password of at least 12 characters.
+                Maintain your account&apos;s security by choosing a strong password. We recommend a password of at least 12 characters.
             </p>
         </div>
 

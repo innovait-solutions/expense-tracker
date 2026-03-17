@@ -86,7 +86,7 @@ export default function ReportsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Financial Analytics</h2>
-          <p className="text-sm text-muted-foreground">Deep insights into your organization's cash flow and growth.</p>
+          <p className="text-sm text-muted-foreground">Deep insights into your organization&apos;s cash flow and growth.</p>
         </div>
         <div className="flex items-center space-x-3">
           <button 

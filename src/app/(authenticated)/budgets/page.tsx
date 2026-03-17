@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { 
   Target, 
@@ -29,7 +29,7 @@ export default function BudgetsPage() {
   const month = date.getMonth();
   const year = date.getFullYear();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const [catRes, budRes] = await Promise.all([
@@ -43,11 +43,11 @@ export default function BudgetsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [month, year]);
 
   useEffect(() => {
     fetchData();
-  }, [month, year]);
+  }, [fetchData]);
 
   const handleUpdateBudget = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,8 +178,8 @@ export default function BudgetsPage() {
                                     autoFocus
                                     type="number"
                                     className="w-24 px-2 py-1 text-sm border rounded-lg bg-background"
-                                    value={editingBudget.amount}
-                                    onChange={(e) => setEditingBudget({ ...editingBudget, amount: e.target.value })}
+                                    value={editingBudget?.amount || ""}
+                                    onChange={(e) => setEditingBudget(prev => prev ? { ...prev, amount: e.target.value } : null)}
                                 />
                                 <button type="submit" className="text-primary hover:text-primary/80">
                                     <CheckCircle2 className="h-5 w-5" />
