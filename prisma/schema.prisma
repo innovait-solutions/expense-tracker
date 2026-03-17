@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  PARTNER
+  VIEWER
+}
+
+enum ExpenseType {
+  ONE_TIME
+  RECURRING
+  MONTHLY
+}
+
+enum Frequency {
+  WEEKLY
+  MONTHLY
+  YEARLY
+  TWO_YEARS
+  THREE_YEARS
+}
+
+enum InvestmentType {
+  ONE_TIME
+  MONTHLY
+}
+
+model Organization {
+  id                String             @id @default(cuid())
+  name              String
+  currency          String             @default("USD")
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  users             User[]
+  partners          Partner[]
+  categories        Category[]
+  expenses          Expense[]
+  recurringExpenses RecurringExpense[]
+  investments       Investment[]
+  budgets           Budget[]
+  activityLogs      ActivityLog[]
+}
+
+model User {
+  id             String        @id @default(cuid())
+  name           String
+  email          String        @unique
+  passwordHash   String
+  role           Role          @default(VIEWER)
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  activityLogs   ActivityLog[]
+}
+
+model Partner {
+  id             String       @id @default(cuid())
+  name           String
+  email          String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  expenses       Expense[]
+  investments    Investment[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([email, organizationId])
+}
+
+model Category {
+  id                String             @id @default(cuid())
+  name              String
+  organizationId    String
+  organization      Organization       @relation(fields: [organizationId], references: [id])
+  expenses          Expense[]
+  recurringExpenses RecurringExpense[]
+  budgets           Budget[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@unique([name, organizationId])
+}
+
+model Expense {
+  id              String       @id @default(cuid())
+  title           String
+  description     String?
+  expenseDate     DateTime
+  categoryId      String
+  category        Category     @relation(fields: [categoryId], references: [id])
+  type            ExpenseType  @default(ONE_TIME)
+  amount          Float
+  paymentMethod   String
+  paidByPartnerId String?
+  paidByPartner   Partner?     @relation(fields: [paidByPartnerId], references: [id])
+  receiptUrl      String?
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model RecurringExpense {
+  id             String       @id @default(cuid())
+  title          String
+  categoryId     String
+  category       Category     @relation(fields: [categoryId], references: [id])
+  amount         Float
+  frequency      Frequency    @default(MONTHLY)
+  nextDueDate    DateTime
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Investment {
+  id             String         @id @default(cuid())
+  partnerId      String
+  partner        Partner        @relation(fields: [partnerId], references: [id])
+  amount         Float
+  investmentType InvestmentType @default(ONE_TIME)
+  investmentDate DateTime
+  notes          String?
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model ActivityLog {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  action         String
+  entityType     String
+  entityId       String
+  createdAt      DateTime     @default(now())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+}
+
+model Budget {
+  id             String       @id @default(cuid())
+  amount         Float
+  month          Int
+  year           Int
+  categoryId     String?
+  category       Category?    @relation(fields: [categoryId], references: [id])
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, categoryId, month, year])
+}
