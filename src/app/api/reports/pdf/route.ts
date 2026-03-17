@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { format } from "date-fns";
 
-export async function GET(req: Request) {
+export async function GET(req: Request): Promise<Response> {
   try {
     const session = await getSession();
     if (!session) {
@@ -102,18 +102,17 @@ export async function GET(req: Request) {
 
     doc.end();
 
-    return new Promise((resolve) => {
+    const pdfBuffer = await new Promise<Buffer>((resolve) => {
       doc.on("end", () => {
-        const result = Buffer.concat(chunks);
-        resolve(
-          new NextResponse(result, {
-            headers: {
-              "Content-Type": "application/pdf",
-              "Content-Disposition": `attachment; filename="FinanceFlow_Report_${month + 1}_${year}.pdf"`,
-            },
-          })
-        );
+        resolve(Buffer.concat(chunks));
       });
+    });
+
+    return new NextResponse(new Uint8Array(pdfBuffer), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="FinanceFlow_Report_${month + 1}_${year}.pdf"`,
+      },
     });
   } catch (error) {
     console.error("PDF generation error:", error);
