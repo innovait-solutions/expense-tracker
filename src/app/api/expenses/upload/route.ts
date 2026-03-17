@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import { getSession } from "@/lib/session";
 import { randomUUID } from "crypto";
 import { supabaseAdmin } from "@/lib/supabase";
