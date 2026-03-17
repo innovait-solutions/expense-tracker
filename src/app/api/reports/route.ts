@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { startOfMonth, endOfMonth, subMonths, format, startOfYear } from "date-fns";
