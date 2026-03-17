@@ -107,3 +107,37 @@ When deploying to production (Vercel, AWS, or Railway), ensure:
 3. **Optimized Build:**
    - Run `npm run build` before starting the server.
    - Docker deployment already handles this via the `Dockerfile`.
+
+## Production Deployment: Vercel & Supabase
+
+For a professional, scalable deployment, we recommend the following stack:
+
+### 1. Database (Supabase)
+1. Create a new project at [supabase.com](https://supabase.com).
+2. Go to **Project Settings > Database** and copy your **Connection String** (URI).
+3. Ensure you have your database password ready.
+4. Your connection string will look like: `postgresql://postgres:[PASSWORD]@db.[REF].supabase.co:5432/postgres`
+
+### 2. Application (Vercel)
+1. Import your GitHub repository into [Vercel](https://vercel.com).
+2. Add the following **Environment Variables**:
+   - `DATABASE_URL`: Your Supabase connection string.
+   - `JWT_SECRET`: A long, random string.
+   - `NODE_ENV`: `production`
+3. Click **Deploy**. Vercel will handle the build and automatically run `prisma generate` via our `postinstall` script.
+
+### 3. Database Migrations
+To apply your schema to the production database:
+1. Temporarily update your local `.env` with the production `DATABASE_URL`.
+2. Run:
+   ```bash
+   npx prisma migrate deploy
+   ```
+   *Always use `migrate deploy` in production to apply migrations safely.*
+
+---
+
+## Technical Support & Maintenance
+- **Logs**: Monitor Vercel "Runtime Logs" for API errors.
+- **Backups**: Supabase provides automatic daily backups.
+- **Scale**: This architecture can handle thousands of concurrent users with minimal configuration.
