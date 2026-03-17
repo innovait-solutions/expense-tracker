@@ -141,6 +141,25 @@ To send invitation emails:
 3. Add `RESEND_API_KEY` to your Vercel Environment Variables.
 4. (Optional) Set `NEXT_PUBLIC_APP_URL` to your production domain so links in emails point to the right place.
 
+### 5. Supabase Storage (File Uploads)
+To fix "read-only filesystem" errors on Vercel, we use Supabase Storage for receipts:
+
+1.  **Create Bucket**:
+    - Go to your **Supabase Dashboard** > **Storage**.
+    - Click **New Bucket** and name it `receipts`.
+    - Toggle **Public bucket** to ON (this allows receipt URLs to be shared/viewed).
+
+2.  **Get API Keys**:
+    - Go to **Project Settings** > **API**.
+    - Find `anon` `public` key -> This is your `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+    - Find `service_role` `secret` key -> This is your `SUPABASE_SERVICE_ROLE_KEY`. (Keep this secret!)
+
+3.  **Add to Vercel**:
+    - Go to **Vercel Settings** > **Environment Variables**.
+    - Add `NEXT_PUBLIC_SUPABASE_URL` (your project URL).
+    - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+    - Add `SUPABASE_SERVICE_ROLE_KEY`.
+
 ---
 
 ## Technical Support & Maintenance

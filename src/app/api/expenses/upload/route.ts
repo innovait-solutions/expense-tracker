@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
 import { getSession } from "@/lib/session";
 import { randomUUID } from "crypto";
+import { supabaseAdmin } from "@/lib/supabase";
 
 export async function POST(req: Request) {
   try {
@@ -21,19 +20,32 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create unique filename
-    const filename = `${randomUUID()}-${file.name.replace(/\s+/g, "_")}`;
-    const uploadDir = join(process.cwd(), "public", "uploads", "receipts");
-    
-    // Ensure directory exists (though we created it, safe to check)
-    await mkdir(uploadDir, { recursive: true });
-    
-    const path = join(uploadDir, filename);
-    await writeFile(path, buffer);
+    // Create unique path in Supabase bucket
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${randomUUID()}.${fileExt}`;
+    const filePath = `${session.organizationId}/${fileName}`;
 
-    const url = `/uploads/receipts/${filename}`;
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabaseAdmin
+      .storage
+      .from('receipts')
+      .upload(filePath, buffer, {
+        contentType: file.type,
+        upsert: false
+      });
 
-    return NextResponse.json({ url });
+    if (uploadError) {
+      console.error("Supabase Storage Error:", uploadError);
+      return NextResponse.json({ error: "Failed to upload to storage" }, { status: 500 });
+    }
+
+    // Get public URL
+    const { data: { publicUrl } } = supabaseAdmin
+      .storage
+      .from('receipts')
+      .getPublicUrl(filePath);
+
+    return NextResponse.json({ url: publicUrl });
   } catch (error) {
     console.error("Upload Error:", error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
